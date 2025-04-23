@@ -4,12 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Locataire extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
+        'user_id',
         'preference',
-        'nrbvist',
+        'nrbvist'
     ];
 
     // Relation avec le message
@@ -30,6 +34,11 @@ class Locataire extends Model
         return $this->hasMany(Location::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // Relation avec l'Avis
     public function avis(): HasMany
     {
@@ -41,5 +50,4 @@ class Locataire extends Model
     {
         return $this->hasMany(Payement::class);
     }
-    use HasFactory;
 }

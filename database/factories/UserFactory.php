@@ -3,42 +3,57 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
-
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'prenom' => $this->faker->firstName(),
+            'matricule' => strtoupper(Str::random(7)),
+            'telephone' => $this->faker->unique()->phoneNumber(),
+            'photoProfile' => null,
+            'cni' => null,
+            'role' => $this->faker->randomElement(['Locataire', 'Bailleur']),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => bcrypt('password'),
             'remember_token' => Str::random(10),
+            'quartier_id' => \App\Models\Quartier::factory(),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
+    public function admin(): static
+    {
+        return $this->state([
+            'role' => 'ADMIN',
+            'email' => 'admin@example.com',
+        ]);
+    }
+
+    public function bailleur(): static
+    {
+        return $this->state([
+            'role' => 'Bailleur',
+        ]);
+    }
+
+    public function locataire(): static
+    {
+        return $this->state([
+            'role' => 'Locataire',
+        ]);
+    }
+
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(function (array $attributes) {
+            return [
+                'email_verified_at' => null,
+                'verification_code' => rand(1000, 9999),
+            ];
+        });
     }
 }

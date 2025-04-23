@@ -2,21 +2,18 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Bailleur;
+use App\Models\Locataire;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -26,32 +23,60 @@ class User extends Authenticatable
         'telephone',
         'photoProfile',
         'cni',
-        'quartierId',
+        'quartier_id',
+        'role',
+        'verification_code',
+        'email_verified_at'
     ];
 
-       // Relation avec les quartiers
-       public function quartier()
-       {
-           return $this->belongsTo(Quartier::class);
-       }
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
+        'verification_code'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function quartier()
+    {
+        return $this->belongsTo(Quartier::class);
+    }
+
+    public function locataire()
+    {
+        return $this->hasOne(Locataire::class);
+    }
+
+    public function bailleur()
+    {
+        return $this->hasOne(Bailleur::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'ADMIN';
+    }
+
+    public function isBailleur()
+    {
+        return $this->role === 'Bailleur';
+    }
+
+    public function isLocataire()
+    {
+        return $this->role === 'Locataire';
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new \App\Notifications\VerifyEmailNotification($this->verification_code));
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }

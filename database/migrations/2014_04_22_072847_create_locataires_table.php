@@ -6,22 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('locataires', function (Blueprint $table) {
             $table->id();
-            $table->string('preference');
-            $table->integer('nrbvist');
+            $table->unsignedBigInteger('user_id');
+            $table->string('preference')->nullable();
+            $table->integer('nrbvist')->default(0);
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('locataires');

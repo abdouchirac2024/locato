@@ -6,25 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('bailleurs', function (Blueprint $table) {
             $table->id();
-            $table->boolean('verif')->default(false); // verification du compte du bailleur
-            $table->string('numFiscal')->nullable(); // numero fiscale
+            $table->unsignedBigInteger('user_id');
+            $table->boolean('verif')->default(false);
+            $table->string('numFiscal')->nullable();
             $table->text('description_fr')->nullable();
-            $table->integer('nbrLog');  // nombre de logement
-              // Champs Anglais
-              $table->text('description_en')->nullable();
+            $table->text('description_en')->nullable();
+            $table->integer('nbrLog')->default(0);
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('bailleurs');

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Database\Seeders\VilleSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,6 +16,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             VilleSeeder::class,
             QuartierSeeder::class,
+            UserSeeder::class,
+            BailleurSeeder::class,
+            LocataireSeeder::class,
         ]);
     }
 }
