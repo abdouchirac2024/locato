@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\VilleController;
+use App\Http\Controllers\Api\QuartierController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +19,23 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Routes API Resource pour Ville
+Route::apiResource('villes', VilleController::class);
+
+// Routes API Resource pour Quartier
+Route::apiResource('quartiers', QuartierController::class);
+
+
+
+
+
+
+// Routes protégées par Sanctum
+// Route::middleware('auth:sanctum')->group(function () {
+//     // Routes API Resource pour Ville
+//     Route::apiResource('villes', VilleController::class);
+    
+//     // Routes API Resource pour Quartier
+//     Route::apiResource('quartiers', QuartierController::class);
+// });

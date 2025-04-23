@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
             // migration
             $table->unsignedBigInteger('locaId'); // locataire id
-            $table->foreign('locaId')->references('id')->on('locataire');
+            $table->foreign('locaId')->references('id')->on('locataires');
             $table->unsignedBigInteger('bailId');
             $table->foreign('bailId')->references('id')->on('bailleurs'); // bailleur id
 

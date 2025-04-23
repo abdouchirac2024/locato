@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('quartiers', function (Blueprint $table) {
             $table->id();
-            $table->string('nomQuartier');
+            $table->string('nomQuartier')->unique();;
             $table->timestamps();
             // migration
             $table->unsignedBigInteger('villeId');

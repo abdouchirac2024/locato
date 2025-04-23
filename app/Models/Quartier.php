@@ -13,10 +13,11 @@ class Quartier extends Model
     ];
     use HasFactory;
 
-       // Relation avec les villes
+    
        public function ville()
-       {
-           return $this->belongsTo(Ville::class);
-       }
+{
+    return $this->belongsTo(Ville::class, 'villeId');
+}
+
     use HasFactory;
 }
