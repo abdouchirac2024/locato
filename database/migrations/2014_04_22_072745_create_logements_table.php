@@ -14,27 +14,30 @@ return new class extends Migration
         Schema::create('logements', function (Blueprint $table) {
             $table->id();
             $table->string('libelle')->nullable();
-            $table->integer('nbrMois');
-            $table->float('prix');
-            $table->integer('nbrpieces');
-            $table->text('descrip')->nullable();//description
-            $table->boolean('contPrep')->nullable();//conteur prepayé
-            $table->boolean('forage')->nullable();
-            $table->boolean('parking')->nullable();
-            $table->boolean('gardien')->nullable();
-            $table->enum('dispo', ['LIBRE', 'OCCUPE'])->default('LIBRE');
+            $table->integer('nbrMois'); // Nombre de mois d'avance exigés
+            $table->float('prix'); // Prix du loyer mensuel
+            $table->integer('nbrpieces'); // Nombre de pièces
+            $table->text('descrip_fr')->nullable(); // Description en français (source)
+            $table->boolean('contPrep')->nullable()->default(false); // compteur prépayé ?
+            $table->boolean('forage')->nullable()->default(false); // forage ?
+            $table->boolean('parking')->nullable()->default(false); // parking ?
+            $table->boolean('gardien')->nullable()->default(false); // gardien ?
+            $table->enum('dispo_fr', ['LIBRE', 'OCCUPE'])->default('LIBRE'); // Disponibilité en français (source)
             $table->timestamps();
-             // migration
-            $table->unsignedBigInteger('typLogId');
-            $table->foreign('typLogId')->references('id')->on('type_logements');
-            $table->unsignedBigInteger('quartierId');
-            $table->foreign('quartierId')->references('id')->on('quartiers');
-            $table->unsignedBigInteger('bailId');
-            $table->foreign('bailId')->references('id')->on('bailleurs'); // id bailleur
 
-              // Champs Anglais
-             $table->text('descrip_en')->nullable();
-             $table->enum('dispo_en', ['FREE', 'RENTED'])->default('FREE');
+            // Clés étrangères
+            $table->unsignedBigInteger('typLogId'); // ID du type de logement
+            $table->foreign('typLogId')->references('id')->on('type_logements')->onDelete('restrict'); // Assurez-vous que type_logements existe
+
+            $table->unsignedBigInteger('quartierId'); // ID du quartier
+            $table->foreign('quartierId')->references('id')->on('quartiers')->onDelete('restrict'); // Assurez-vous que quartiers existe
+
+            $table->unsignedBigInteger('bailId'); // ID du bailleur propriétaire
+            $table->foreign('bailId')->references('id')->on('bailleurs')->onDelete('cascade'); // Assurez-vous que bailleurs existe
+
+            // Champs pour la traduction automatique
+            $table->text('descrip_en')->nullable(); // Description traduite en anglais
+            $table->enum('dispo_en', ['FREE', 'RENTED'])->nullable(); // Disponibilité traduite en anglais
         });
     }
 

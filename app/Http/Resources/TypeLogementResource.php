@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class VilleResource extends JsonResource
+class TypeLogementResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,12 +14,15 @@ class VilleResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-         if (is_null($this->resource)) {
+        // Vérifie si la ressource sous-jacente n'est pas nulle
+        if (is_null($this->resource)) {
             return [];
         }
+
         return [
             'id' => $this->id,
-            'nom' => $this->nomVille, // Utilise le nom de colonne 'nomVille'
+            'libelle' => $this->Standing, // Utilise le nom de colonne 'Standing' du modèle
+            // Ajoutez d'autres champs du modèle TypeLogement si nécessaire
         ];
     }
 }
