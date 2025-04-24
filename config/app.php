@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Locato'), // Nom personnalisé si vous voulez
 
     /*
     |--------------------------------------------------------------------------
@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Africa/Douala', // Fuseau horaire ajusté (Exemple)
 
     /*
     |--------------------------------------------------------------------------
@@ -83,7 +83,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'fr', // *** MODIFIÉ: Locale par défaut définie sur Français ***
 
     /*
     |--------------------------------------------------------------------------
@@ -96,7 +96,18 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => 'fr', // *** MODIFIÉ: Locale de secours définie sur Français ***
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Locales
+    |--------------------------------------------------------------------------
+    |
+    | List of locales supported by the application for translation checks, etc.
+    | Used by our custom logic in the controller.
+    |
+    */
+    'available_locales' => ['fr', 'en'], // *** AJOUTÉ: Liste des langues supportées ***
 
     /*
     |--------------------------------------------------------------------------
@@ -109,7 +120,7 @@ return [
     |
     */
 
-    'faker_locale' => 'en_US',
+    'faker_locale' => 'fr_FR', // Modifié pour correspondre à la locale principale si souhaité
 
     /*
     |--------------------------------------------------------------------------
@@ -165,9 +176,10 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        // App\Providers\BroadcastServiceProvider::class, // Décommenter si vous utilisez les broadcasts
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        // Ajoutez ici d'autres fournisseurs de services de packages ou personnalisés si nécessaire
     ])->toArray(),
 
     /*
@@ -182,7 +194,8 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'Example' => App\Facades\Example::class,
+        // 'Example' => App\Facades\Example::class, // Exemple d'alias personnalisé
+        // Ajoutez ici d'autres alias si nécessaire
     ])->toArray(),
 
 ];
