@@ -13,18 +13,21 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->text('msg');
-            $table->enum('result', ['ACCEPTE', 'REFUSE'])->nullable();
-            $table->date('dateEnv');
+            $table->text('msg_fr'); // Message in French
+            $table->enum('result', ['ACCEPTE', 'REFUSE'])->nullable(); // Result in French
+            $table->enum('result_en', ['ACCEPTE', 'REFUSE'])->nullable(); // Result in English
+            $table->date('dateEnv'); // Date of sending
             $table->timestamps();
-            // migration
-            $table->unsignedBigInteger('locaId'); // locataire id
-            $table->foreign('locaId')->references('id')->on('locataires');
-            $table->unsignedBigInteger('bailId');
-            $table->foreign('bailId')->references('id')->on('bailleurs'); // bailleur id
 
-             // Champs Anglais
-             $table->text('msg_en')->nullable();
+            // Foreign keys
+            $table->unsignedBigInteger('locaId'); // locataire id
+            $table->foreign('locaId')->references('id')->on('locataires')->onDelete('cascade');
+
+            $table->unsignedBigInteger('bailId'); // bailleur id
+            $table->foreign('bailId')->references('id')->on('bailleurs')->onDelete('cascade');
+
+            // English fields
+            $table->text('msg_en')->nullable(); // Message in English
         });
     }
 

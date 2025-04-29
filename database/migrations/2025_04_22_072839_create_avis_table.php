@@ -18,14 +18,15 @@ return new class extends Migration
             $table->integer('note');
             $table->boolean('visible')->default(false);
             $table->timestamps();
-              // migration
-            $table->unsignedBigInteger('locaId');// locataire id
+
+            // Clés étrangères
+            $table->unsignedBigInteger('locaId'); // locataire id
             $table->foreign('locaId')->references('id')->on('locataires');
             $table->unsignedBigInteger('logId'); // logement id
             $table->foreign('logId')->references('id')->on('logements');
 
-             // Champs Anglais
-             $table->text('coment_en')->nullable();
+            // Champs Anglais
+            $table->text('coment_en')->nullable();  // Commentaire en anglais
         });
     }
 

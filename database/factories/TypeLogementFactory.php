@@ -21,10 +21,11 @@ class TypeLogementFactory extends Factory
      */
     public function definition(): array
     {
-        // La seule colonne à remplir est 'Standing' selon votre migration
         return [
-            'Standing' => $this->faker->randomElement(['Luxe', 'Haut Standing', 'Moyen Standing', 'Economique', 'Social']), // Génère un type de standing aléatoire parmi une liste prédéfinie
-            // Si vous aviez d'autres colonnes dans TypeLogement, définissez-les ici.
+            'libelle_logement' => $this->faker->word(), // Génère un libellé aléatoire en français
+            'libelle_logement_en' => $this->faker->word(), // Génère un libellé aléatoire en anglais
+            'standing' => $this->faker->randomElement(['Luxe', 'Haut Standing', 'Moyen Standing', 'Economique', 'Social']), // Génère un type de standing aléatoire
+            'standing_en' => $this->faker->randomElement(['Luxury', 'High Standing', 'Medium Standing', 'Economical', 'Social']), // Génère une traduction aléatoire en anglais pour le standing
         ];
     }
 }

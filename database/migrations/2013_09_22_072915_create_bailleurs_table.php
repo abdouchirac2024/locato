@@ -6,13 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up(): void
     {
         Schema::create('bailleurs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->boolean('verif')->default(false);
+
+            $table->enum('statut_fr', ['en_attente', 'verifie'])->nullable()->default('en_attente');
+            $table->enum('statut_en', ['pending', 'verified'])->nullable()->default('pending');
             $table->string('numFiscal')->nullable();
             $table->text('description_fr')->nullable();
             $table->text('description_en')->nullable();

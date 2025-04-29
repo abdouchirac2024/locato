@@ -6,24 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('image_logements', function (Blueprint $table) {
             $table->id();
-            $table->binary('urlImage');
+            $table->string('urlImage');
             $table->float('taille');
+            $table->boolean('is_principale')->default(false);
+            $table->string('titre')->nullable();
+            $table->string('titre_en')->nullable();
             $table->timestamps();
-            $table->unsignedBigInteger('logId'); // id logement
-            $table->foreign('logId')->references('id')->on('logements');
+
+            $table->unsignedBigInteger('logId');
+            $table->foreign('logId')->references('id')->on('logements')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('image_logements');

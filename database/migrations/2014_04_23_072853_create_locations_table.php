@@ -18,17 +18,18 @@ return new class extends Migration
             $table->date('dateFin');
             $table->string('caution');
             $table->enum('statut_fr', ['En cours', 'Terminé', 'Annulé'])->default('En cours');
-            $table->timestamps();
-             // migration
-            $table->unsignedBigInteger('locaId');
-            $table->foreign('locaId')->references('id')->on('locataires');
-            $table->unsignedBigInteger('bailId');
-            $table->foreign('bailId')->references('id')->on('bailleurs');
-            $table->unsignedBigInteger('logId');
-            $table->foreign('logId')->references('id')->on('logements');
-
-             // Champs Anglais
             $table->enum('statut_en', ['In progress', 'Completed', 'Cancelled'])->default('In progress');
+
+            // Foreign keys
+            $table->unsignedBigInteger('locaId');
+            $table->unsignedBigInteger('bailId');
+            $table->unsignedBigInteger('logId');
+
+            $table->timestamps();
+
+            $table->foreign('locaId')->references('id')->on('locataires')->onDelete('cascade');
+            $table->foreign('bailId')->references('id')->on('bailleurs')->onDelete('cascade');
+            $table->foreign('logId')->references('id')->on('logements')->onDelete('cascade');
         });
     }
 

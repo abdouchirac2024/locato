@@ -15,18 +15,24 @@ return new class extends Migration
             $table->id();
             $table->date('dateVisite');
             $table->time('heureVisite');
-            $table->enum('statut', ['ACCEPTE', 'REFUSE'])->nullable();
+
+            // Statut en français et en anglais
+            $table->enum('statut_fr', ['PROGRAMMEE', 'ANNULEE', 'TERMINEE', 'REPORTEE'])->default('PROGRAMMEE');
+            $table->enum('statut_en', ['SCHEDULED', 'CANCELLED', 'COMPLETED', 'POSTPONED'])->default('SCHEDULED');
+
+            $table->text('commentaire')->nullable();
             $table->boolean('confirmation')->nullable();
             $table->text('motifRejet_fr');
             $table->timestamps();
-              // migration
+
+            // Foreign keys
             $table->unsignedBigInteger('payId');
             $table->foreign('payId')->references('id')->on('payements');
             $table->unsignedBigInteger('logId');
             $table->foreign('logId')->references('id')->on('logements');
 
-             // Champs Anglais
-             $table->text('motifRejet_en')->nullable();
+            // Champs Anglais
+            $table->text('motifRejet_en')->nullable();
         });
     }
 

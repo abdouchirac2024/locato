@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('locataires', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('preference')->nullable();
+            $table->text('preference')->nullable();
             $table->integer('nrbvist')->default(0);
             $table->timestamps();
 

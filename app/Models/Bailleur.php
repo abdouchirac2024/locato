@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class Bailleur extends Model
@@ -14,6 +15,8 @@ class Bailleur extends Model
     protected $fillable = [
         'user_id',
         'verif',
+        'statut_fr',
+        'statut_en',
         'numFiscal',
         'description_fr',
         'description_en',
@@ -41,7 +44,7 @@ class Bailleur extends Model
         });
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -77,7 +80,7 @@ class Bailleur extends Model
     }
 
     /**
-     * Accesseur pour la description dans la langue courante
+     * Accessor for the description in the current language
      */
     public function getDescriptionAttribute()
     {

@@ -13,9 +13,17 @@ return new class extends Migration
     {
         Schema::create('annonces', function (Blueprint $table) {
             $table->id();
-            $table->date('dateAnn'); // date annonce
+            $table->string('titre_fr');
+            $table->string('titre_en')->nullable();
+            $table->text('contenu_fr');
+            $table->text('contenu_en')->nullable();
+            $table->date('date_publication');
+            $table->date('date_expiration')->nullable();
+            $table->boolean('is_active')->default(true);
+
             $table->timestamps();
-            // migration
+
+            // Foreign keys
             $table->unsignedBigInteger('logId');
             $table->foreign('logId')->references('id')->on('logements');
             $table->unsignedBigInteger('bailId');
