@@ -65,6 +65,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === 'Bailleur';
     }
 
+    public function isBailleurVerified()
+    {
+        return $this->isBailleur() && $this->bailleur->statut_fr === 'verifie';
+    }
+
     public function isLocataire()
     {
         return $this->role === 'Locataire';

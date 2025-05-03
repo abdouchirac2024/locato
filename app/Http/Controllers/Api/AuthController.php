@@ -64,30 +64,36 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        $user = $this->authService->login($request->login, $request->password);
+        try {
+            $user = $this->authService->login($request->login, $request->password);
 
-        if (!$user) {
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Identifiants incorrects',
+                ], 401);
+            }
+
+            // Vérifier si l'email est vérifié (si email existe)
+            if ($user->email && !$user->hasVerifiedEmail()) {
+                return response()->json([
+                    'message' => 'Veuillez vérifier votre email avant de vous connecter',
+                    'user' => new UserResource($user),
+                ], 403);
+            }
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()->json([
-                'message' => 'Identifiants incorrects',
+                'message' => 'Connexion réussie',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => new UserResource($user),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
             ], 401);
         }
-
-        // Vérifier si l'email est vérifié (si email existe)
-        if ($user->email && !$user->hasVerifiedEmail()) {
-            return response()->json([
-                'message' => 'Veuillez vérifier votre email avant de vous connecter',
-                'user' => new UserResource($user),
-            ], 403);
-        }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Connexion réussie',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => new UserResource($user),
-        ]);
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\QuartierController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\LogementController; // Importez le contrôleur
+use App\Http\Controllers\Api\BailleurController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,12 @@ Route::prefix('auth')->name('auth.')->group(function () { // Ajout de name() pou
     });
 });
 
+// Routes pour la gestion des bailleurs
+Route::prefix('bailleurs')->name('bailleurs.')->group(function () {
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+        Route::post('/verify', [BailleurController::class, 'verify'])->name('verify');
+    });
+});
 
 // --- Routes pour Villes et Quartiers (Publiques, comme avant le conflit) ---
 Route::apiResource('villes', VilleController::class);

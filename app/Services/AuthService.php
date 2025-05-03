@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\VerificationCodeMail;
 use App\Mail\WelcomeMail;
+use App\Mail\BailleurVerifiedMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -44,7 +45,15 @@ class AuthService
 
         // Envoyer le code de vérification par email si email fourni
         if ($user->email) {
-            Mail::to($user->email)->send(new VerificationCodeMail($user->verification_code));
+            try {
+                \Log::info('Tentative d\'envoi d\'email de vérification à: ' . $user->email);
+                Mail::to($user->email)->send(new VerificationCodeMail($user->verification_code));
+                \Log::info('Email de vérification envoyé avec succès à: ' . $user->email);
+            } catch (\Exception $e) {
+                \Log::error('Erreur lors de l\'envoi de l\'email de vérification à ' . $user->email . ': ' . $e->getMessage());
+            }
+        } else {
+            \Log::warning('Pas d\'email fourni pour l\'utilisateur: ' . $user->name);
         }
 
         return $user;
@@ -60,7 +69,13 @@ class AuthService
 
             // Envoyer un email de bienvenue
             if ($user->email) {
-                Mail::to($user->email)->send(new WelcomeMail($user));
+                try {
+                    \Log::info('Tentative d\'envoi d\'email de bienvenue à: ' . $user->email);
+                    Mail::to($user->email)->send(new WelcomeMail($user));
+                    \Log::info('Email de bienvenue envoyé avec succès à: ' . $user->email);
+                } catch (\Exception $e) {
+                    \Log::error('Erreur lors de l\'envoi de l\'email de bienvenue à ' . $user->email . ': ' . $e->getMessage());
+                }
             }
 
             return true;
@@ -79,7 +94,36 @@ class AuthService
             return null;
         }
 
+        // Vérifier si c'est un bailleur non vérifié
+        if ($user->isBailleur() && (!$user->bailleur || $user->bailleur->verif != 1)) {
+            return null;
+        }
+
         return $user;
+    }
+
+    public function verifyBailleur(User $user): bool
+    {
+        if (!$user->isBailleur()) {
+            return false;
+        }
+
+        // Mettre à jour tous les champs du bailleur
+        $bailleur = $user->bailleur;
+        if (!$bailleur) {
+            return false;
+        }
+
+        $bailleur->verif = true;
+        $bailleur->statut_fr = 'verifie';
+        $bailleur->statut_en = 'verified';
+        $bailleur->save();
+
+        // Mettre à jour la date de vérification de l'utilisateur
+        $user->email_verified_at = now();
+        $user->save();
+
+        return true;
     }
 
     public function updateProfile(User $user, array $data): User
