@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Bailleur;
 use App\Models\User;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\JsonResponse;
-use App\Http\Requests\VerifyBailleurRequest;
 
 class BailleurController extends Controller
 {
@@ -18,8 +15,6 @@ class BailleurController extends Controller
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
-        $this->middleware('auth:sanctum');
-        $this->middleware('admin');
     }
 
     public function index(Request $request)
@@ -117,20 +112,5 @@ class BailleurController extends Controller
                 'message' => 'Une erreur est survenue lors de la mise à jour du statut'
             ], 500);
         }
-    }
-
-    public function verify(VerifyBailleurRequest $request): JsonResponse
-    {
-        $user = User::findOrFail($request->user_id);
-
-        if ($this->authService->verifyBailleur($user)) {
-            return response()->json([
-                'message' => 'Le bailleur a été vérifié avec succès. Un email a été envoyé avec les nouvelles informations de connexion.'
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Impossible de vérifier ce bailleur. Vérifiez que l\'utilisateur est bien un bailleur.'
-        ], 400);
     }
 } 

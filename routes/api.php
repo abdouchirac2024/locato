@@ -40,7 +40,8 @@ Route::prefix('auth')->name('auth.')->group(function () { // Ajout de name() pou
 // Routes pour la gestion des bailleurs
 Route::prefix('bailleurs')->name('bailleurs.')->group(function () {
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-        Route::post('/verify', [BailleurController::class, 'verify'])->name('verify');
+        Route::get('/', [BailleurController::class, 'index'])->name('index');
+        Route::put('/{id}/status', [BailleurController::class, 'updateStatus'])->name('status.update');
     });
 });
 
