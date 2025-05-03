@@ -91,12 +91,18 @@ class AuthService
             ->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
-            return null;
+            throw new \Exception("Identifiants incorrects");
         }
 
-        // Vérifier si c'est un bailleur non vérifié
-        if ($user->isBailleur() && (!$user->bailleur || $user->bailleur->verif != 1)) {
-            return null;
+        // Vérifier si c'est un bailleur
+        if ($user->isBailleur()) {
+            if (!$user->bailleur) {
+                throw new \Exception("Votre compte bailleur n'est pas encore configuré. Veuillez contacter l'administrateur.");
+            }
+            
+            if (!$user->bailleur->verif || $user->bailleur->statut_fr !== 'verifie') {
+                throw new \Exception("Votre compte bailleur est en attente de validation par l'administrateur. Veuillez patienter.");
+            }
         }
 
         return $user;
@@ -122,6 +128,29 @@ class AuthService
         // Mettre à jour la date de vérification de l'utilisateur
         $user->email_verified_at = now();
         $user->save();
+
+        // Envoyer l'email de notification
+        if ($user->email) {
+            try {
+                \Log::info('Tentative d\'envoi d\'email de vérification bailleur', [
+                    'email' => $user->email,
+                    'user_id' => $user->id
+                ]);
+                
+                Mail::to($user->email)->send(new BailleurVerifiedMail($user));
+                
+                \Log::info('Email de vérification bailleur envoyé avec succès', [
+                    'email' => $user->email,
+                    'user_id' => $user->id
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Erreur lors de l\'envoi de l\'email de vérification bailleur', [
+                    'email' => $user->email,
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
 
         return true;
     }
