@@ -45,23 +45,40 @@ class Logement extends Model
         parent::boot();
 
         static::creating(function ($logement) {
-            $translator = new GoogleTranslate('en');
-            $translator->setSource('fr');
+            try {
+                $translator = new GoogleTranslate('en');
+                $translator->setSource('fr');
+                $translator->setOptions(['timeout' => 10]);
 
-            if ($logement->libelle && !$logement->libelle_en) {
-                $logement->libelle_en = $translator->translate($logement->libelle);
-            }
-
-            if ($logement->descrip_fr && !$logement->descrip_en) {
-                $logement->descrip_en = $translator->translate($logement->descrip_fr);
-            }
-
-            if ($logement->dispo_fr && !$logement->dispo_en) {
-                if ($logement->dispo_fr === 'LIBRE') {
-                    $logement->dispo_en = 'FREE';
-                } elseif ($logement->dispo_fr === 'OCCUPE') {
-                    $logement->dispo_en = 'RENTED';
+                if ($logement->libelle && !$logement->libelle_en) {
+                    try {
+                        $logement->libelle_en = $translator->translate($logement->libelle);
+                    } catch (\Exception $e) {
+                        \Log::warning('Erreur de traduction pour libelle: ' . $e->getMessage());
+                        $logement->libelle_en = $logement->libelle;
+                    }
                 }
+
+                if ($logement->descrip_fr && !$logement->descrip_en) {
+                    try {
+                        $logement->descrip_en = $translator->translate($logement->descrip_fr);
+                    } catch (\Exception $e) {
+                        \Log::warning('Erreur de traduction pour description: ' . $e->getMessage());
+                        $logement->descrip_en = $logement->descrip_fr;
+                    }
+                }
+
+                if ($logement->dispo_fr && !$logement->dispo_en) {
+                    if ($logement->dispo_fr === 'LIBRE') {
+                        $logement->dispo_en = 'FREE';
+                    } elseif ($logement->dispo_fr === 'OCCUPE') {
+                        $logement->dispo_en = 'RENTED';
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Erreur générale de traduction: ' . $e->getMessage());
+                if (!$logement->libelle_en) $logement->libelle_en = $logement->libelle;
+                if (!$logement->descrip_en) $logement->descrip_en = $logement->descrip_fr;
             }
         });
     }

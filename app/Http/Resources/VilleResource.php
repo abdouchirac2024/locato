@@ -14,12 +14,21 @@ class VilleResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-         if (is_null($this->resource)) {
+        if (is_null($this->resource)) {
             return [];
         }
         return [
             'id' => $this->id,
-            'nom' => $this->nomVille, // Utilise le nom de colonne 'nomVille'
+            'nom' => $this->nomVille,
+            'del_yn' => $this->del_yn,
+            'created_by' => $this->whenLoaded('creator', function() {
+                return [
+                    'id' => $this->creator->id,
+                    'name' => $this->creator->name
+                ];
+            }),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }

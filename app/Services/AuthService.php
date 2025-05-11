@@ -99,10 +99,6 @@ class AuthService
             if (!$user->bailleur) {
                 throw new \Exception("Votre compte bailleur n'est pas encore configuré. Veuillez contacter l'administrateur.");
             }
-            
-            if (!$user->bailleur->verif || $user->bailleur->statut_fr !== 'verifie') {
-                throw new \Exception("Votre compte bailleur est en attente de validation par l'administrateur. Veuillez patienter.");
-            }
         }
 
         return $user;

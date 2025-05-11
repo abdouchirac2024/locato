@@ -12,14 +12,17 @@ class UpdateLogementRequest extends FormRequest
 {
     /**
      * Détermine si l'utilisateur est autorisé à faire cette requête.
-     * Vérifie si l'utilisateur est connecté. L'autorisation de modifier
+     * Vérifie si l'utilisateur est connecté, est un bailleur et est vérifié
      * *ce logement spécifique* sera faite dans le LogementService.
      * Pour une meilleure approche, utilisez une Policy.
      */
     public function authorize(): bool
     {
-        // Option 1: Simple vérification de connexion (le service gère la propriété)
-         return Auth::check() && Auth::user()->isBailleur();
+        // Vérifie si l'utilisateur est connecté, est un bailleur et est vérifié
+        return Auth::check() && 
+               Auth::user()->isBailleur() && 
+               Auth::user()->bailleur->verif && 
+               Auth::user()->bailleur->statut_fr === 'verifie';
 
         // Option 2: Utilisation d'une Policy (meilleure pratique)
         // Assurez-vous d'avoir créé LogementPolicy et enregistré dans AuthServiceProvider

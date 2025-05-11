@@ -10,12 +10,15 @@ class StoreLogementRequest extends FormRequest
 {
     /**
      * Détermine si l'utilisateur authentifié est autorisé à faire cette requête.
-     * Ici, on vérifie s'il est connecté ET s'il a le rôle Bailleur.
+     * Ici, on vérifie s'il est connecté ET s'il a le rôle Bailleur et est vérifié.
      */
     public function authorize(): bool
     {
-        // Renvoie true si l'utilisateur est connecté et est un bailleur
-        return Auth::check() && Auth::user()->isBailleur();
+        // Vérifie si l'utilisateur est connecté, est un bailleur et est vérifié
+        return Auth::check() && 
+               Auth::user()->isBailleur() && 
+               Auth::user()->bailleur->verif && 
+               Auth::user()->bailleur->statut_fr === 'verifie';
     }
 
     /**
