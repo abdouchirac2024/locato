@@ -29,7 +29,7 @@ class UserFactory extends Factory
     {
         return $this->state([
             'role' => 'ADMIN',
-            'email' => 'admin@example.com',
+            'email' => 'helpstore713@gmail.com',
         ]);
     }
 

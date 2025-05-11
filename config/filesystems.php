@@ -38,8 +38,8 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'root' => storage_path('app/public'),     // Chemin physique
+            'url' => env('APP_URL') . '/storage',     // URL publique
             'visibility' => 'public',
             'throw' => false,
         ],

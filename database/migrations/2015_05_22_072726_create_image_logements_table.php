@@ -10,14 +10,16 @@ return new class extends Migration
     {
         Schema::create('image_logements', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('logId');
             $table->string('urlImage');
-            $table->float('taille');
+            // --- CORRECTION ---
+            // Utiliser un entier non signé assez grand pour stocker la taille en octets
+            $table->unsignedBigInteger('taille')->nullable(); // Rendre nullable au cas où getSize() échoue
+            // --- FIN CORRECTION ---
             $table->boolean('is_principale')->default(false);
             $table->string('titre')->nullable();
             $table->string('titre_en')->nullable();
             $table->timestamps();
-
-            $table->unsignedBigInteger('logId');
             $table->foreign('logId')->references('id')->on('logements')->onDelete('cascade');
         });
     }

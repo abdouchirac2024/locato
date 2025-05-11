@@ -7,6 +7,7 @@ use App\Models\Logement;
 use App\Models\Quartier;
 use App\Models\TypeLogement;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str; // Pour Str::random
 
 class LogementFactory extends Factory
 {
@@ -14,30 +15,37 @@ class LogementFactory extends Factory
 
     public function definition(): array
     {
-        // Création ou récupération des entités associées
         $typeLogement = TypeLogement::inRandomOrder()->first() ?? TypeLogement::factory()->create();
         $quartier = Quartier::inRandomOrder()->first() ?? Quartier::factory()->create();
         $bailleur = Bailleur::inRandomOrder()->first() ?? Bailleur::factory()->create();
-
-        // Génération aléatoire pour le statut de disponibilité
         $dispo_fr = $this->faker->randomElement(['LIBRE', 'OCCUPE']);
 
         return [
-            'libelle' => $this->faker->words(3, true), // Ex: "Joli studio meublé"
+            'reference' => 'LOG-' . strtoupper(Str::random(8)),
+            'libelle' => $this->faker->sentence(4), // Génère un libellé FR
+            // 'libelle_en' => null, // Laissé null pour traduction auto (si colonne existe)
+            'latitude' => $this->faker->latitude(4.0, 4.1), // Exemple pour Douala/Yaoundé
+            'longitude' => $this->faker->longitude(9.6, 11.6), // Exemple pour Douala/Yaoundé
+            'nbrpieces' => $this->faker->numberBetween(1, 10),
+            'superficie' => $this->faker->numberBetween(20, 300),
+            'nbr_salles_bain' => $this->faker->numberBetween(1, 4),
+            'nbr_chambres' => $this->faker->numberBetween(1, 6),
+            'climatisation' => $this->faker->boolean(30),
+            'meuble' => $this->faker->boolean(50),
+            'adresse' => $this->faker->streetAddress,
+            'prix' => $this->faker->randomFloat(0, 50000, 1000000), // Prix sans décimales
             'nbrMois' => $this->faker->numberBetween(1, 6),
-            'prix' => $this->faker->randomFloat(2, 50000, 500000), // Prix avec deux décimales
-            'nbrpieces' => $this->faker->numberBetween(1, 8),
-            'descrip_fr' => $this->faker->realText(200), // Génère une description réaliste
-            'descrip_en' => $this->faker->realText(200), // Description en anglais, ajoutée pour le multilingue
-            'contPrep' => $this->faker->boolean(60), // 60% de chance d'être true
-            'forage' => $this->faker->boolean(20), // 20% de chance d'être true
-            'parking' => $this->faker->boolean(75), // 75% de chance d'être true
-            'gardien' => $this->faker->boolean(40), // 40% de chance d'être true
-            'dispo_fr' => $dispo_fr, // 'LIBRE' ou 'OCCUPE'
-            'dispo_en' => $dispo_fr == 'LIBRE' ? 'FREE' : 'RENTED', // Traduction basée sur la dispo_fr
+            'descrip_fr' => $this->faker->realText(300), // Description FR
+            // 'descrip_en' sera généré par le modèle
+            'contPrep' => $this->faker->boolean(60),
+            'forage' => $this->faker->boolean(20),
+            'parking' => $this->faker->boolean(75),
+            'gardien' => $this->faker->boolean(40),
+            'dispo_fr' => $dispo_fr,
+            // 'dispo_en' sera généré par le modèle
             'typLogId' => $typeLogement->id,
             'quartierId' => $quartier->id,
-            'bailId' => $bailleur->id, // ID du bailleur
+            'bailId' => $bailleur->id,
         ];
     }
 }

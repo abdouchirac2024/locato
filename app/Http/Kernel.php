@@ -38,12 +38,11 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
-       'api' => [
-    \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-    'throttle:api',
-    \Illuminate\Routing\Middleware\SubstituteBindings::class,
-],
-
+        'api' => [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            'throttle:api',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
     ];
 
     /**
@@ -64,7 +63,7 @@ class Kernel extends HttpKernel
         'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-      
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'admin' => \App\Http\Middleware\IsAdminMiddleware::class, // <-- Ajout du middleware admin
     ];
 }
