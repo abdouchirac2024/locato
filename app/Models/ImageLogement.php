@@ -12,12 +12,12 @@ class ImageLogement extends Model
     use HasFactory;
 
     protected $fillable = [
+        'logId', // <-- AJOUTER CETTE LIGNE
         'urlImage',
         'taille',
         'is_principale',
         'titre',
         'titre_en',
-        'logId'
     ];
 
     protected static function boot()
