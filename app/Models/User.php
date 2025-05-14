@@ -26,7 +26,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'quartier_id',
         'role',
         'verification_code',
-        'email_verified_at'
+        'email_verified_at',
+        'status'
     ];
 
     protected $hidden = [
@@ -65,6 +66,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === 'Bailleur';
     }
 
+    public function isBailleurVerified()
+    {
+        return $this->isBailleur() && $this->bailleur->statut_fr === 'verifie';
+    }
+
     public function isLocataire()
     {
         return $this->role === 'Locataire';
@@ -80,5 +86,22 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     $this->notify(new \App\Notifications\ResetPasswordNotification($token));
 }
-   
+
+    // Méthode pour activer un utilisateur
+    public function activate()
+    {
+        $this->update(['status' => 'active']);
+    }
+
+    // Méthode pour désactiver un utilisateur
+    public function deactivate()
+    {
+        $this->update(['status' => 'inactive']);
+    }
+
+    // Vérifier si l'utilisateur est actif
+    public function isActive()
+    {
+        return $this->status === 'active';
+    }
 }

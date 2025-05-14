@@ -11,7 +11,7 @@ class Payement extends Model
         'montant',
         'reference',
         'operateur',
-        'locaId',
+       
         'locaId',
     ];
 // Relation avec les locataires

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use Stichoza\GoogleTranslate\GoogleTranslate;
 class Locataire extends Model
 {
     use HasFactory;
@@ -13,6 +13,8 @@ class Locataire extends Model
     protected $fillable = [
         'user_id',
         'preference',
+        // "status_fr",
+        // "status_en",
         'nrbvist'
     ];
 

@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('telephone')->unique();
             $table->string('photoProfile')->nullable();
             $table->string('cni')->nullable();
+<<<<<<< HEAD
+=======
+            $table->enum('status', ['active', 'inactive'])->default('inactive');
+>>>>>>> 172c567c215f6076d8e6aab0684aa69c300f9117
             $table->enum('role', ['ADMIN', 'Locataire', 'Bailleur']);
             $table->string('verification_code')->nullable();
             $table->timestamp('email_verified_at')->nullable();

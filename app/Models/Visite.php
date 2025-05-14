@@ -14,7 +14,7 @@ class Visite extends Model
         'dateVisite',
         'heureVisite',
         'confirmation',
-        'payId',
+       
         'logId',
         'motifRejet_fr',
         'motifRejet_en',
@@ -30,13 +30,7 @@ class Visite extends Model
         return $this->belongsTo(Logement::class);
     }
 
-    /**
-     * Relation avec le paiement
-     */
-    public function payement()
-    {
-        return $this->belongsTo(Payement::class);
-    }
+   
 
     /**
      * Accesseur pour le statut dans la langue courante
