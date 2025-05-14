@@ -24,11 +24,6 @@ class QuartierResource extends JsonResource
         return [
             'id' => $this->id,
             'nomQuartier' => $this->nomQuartier, // Nom du quartier
-<<<<<<< HEAD
-            // Inclut le nom de la ville seulement si la relation 'ville' a été chargée
-            'nomVille' => $this->whenLoaded('ville', fn() => $this->ville->nomVille),
-            'villeId' => $this->villeId, // Inclut l'ID de la ville (clé étrangère)
-=======
             'del_yn' => $this->del_yn,
             'created_by' => $this->whenLoaded('creator', function() {
                 return [
@@ -45,7 +40,6 @@ class QuartierResource extends JsonResource
             'villeId' => $this->villeId, // Inclut l'ID de la ville (clé étrangère)
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
->>>>>>> 172c567c215f6076d8e6aab0684aa69c300f9117
         ];
     }
 }
