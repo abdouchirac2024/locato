@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Annonce;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class CreateAnnonceMailReceptionMail extends Mailable
+class ConfirmAnnonceMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -27,7 +27,7 @@ class CreateAnnonceMailReceptionMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reception de demande de creation d annonce',
+            subject: 'Confirmation d\'une annonce',
         );
     }
 
@@ -37,7 +37,7 @@ class CreateAnnonceMailReceptionMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: '/emails/CreateAnnonceMailReceptionMail',
+            view: '/emails/Annonce/CofirmAnnonce',
         );
     }
 

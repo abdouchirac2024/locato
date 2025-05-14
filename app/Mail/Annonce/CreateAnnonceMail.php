@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Annonce;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 class CreateAnnonceMail extends Mailable
 {
+  
     use Queueable, SerializesModels;
     public $annonce;
 
@@ -27,7 +28,7 @@ class CreateAnnonceMail extends Mailable
     public function build()
     {
         return $this->subject('Demande de creation d\'une annonce')
-            ->view('/emails/CreationAnnonce')
+            ->view('/emails/Annonce/CreationAnnonce')
             ->with(['annonce' => $this->annonce]);
     }
 }

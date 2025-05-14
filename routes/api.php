@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\QuartierController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\LogementController; // Importez le contrôleur
-use App\Http\Controllers\Api\AnnonceController;
+use App\Http\Controllers\Api\Annonce\AnnonceController;
 
 /*
 |--------------------------------------------------------------------------
