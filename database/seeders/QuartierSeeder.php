@@ -8,26 +8,52 @@ use App\Models\Ville;
 
 class QuartierSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Récupération des villes créées
-        $douala = Ville::where('nomVille', 'Douala')->first();
-        $yaounde = Ville::where('nomVille', 'Yaoundé')->first();
+        // Tableau des villes et leurs quartiers respectifs
+        $data = [
+            'Douala' => [
+                'Akwa', 'Bonanjo', 'Bonapriso', 'Bonamoussadi', 'Makepe', 'Logbessou', 'Logpom',
+                'Kotto', 'Ndokoti', 'New-Bell', 'Bali', 'Deïdo', 'Ndogbong', 'Bépanda',
+                'Cité des Palmiers', 'Village', 'PK8', 'PK14', 'PK17', 'Yassa', 'Ndogsimbi',
+                'Nyalla', 'Logbaba', 'Mboppi', 'Cité SIC', 'Bilongue', 'Bonabéri', 'Kombé',
+                'Mbanya', 'Makèpè Missokè',
+            ],
 
-        // Création des quartiers associés aux villes
-        $quartiers = [
-            ['nomQuartier' => 'Bonamoussadi', 'villeId' => $douala->id],
-            ['nomQuartier' => 'Akwa', 'villeId' => $douala->id],
-            ['nomQuartier' => 'Ndogbong', 'villeId' => $douala->id],
-            ['nomQuartier' => 'Mvog-Ada', 'villeId' => $yaounde->id],
-            ['nomQuartier' => 'Essos', 'villeId' => $yaounde->id],
+            'Yaoundé' => [
+                'Mvog-Ada', 'Essos', 'Biyem-Assi', 'Melen', 'Ngoa-Ekelle', 'Emana', 'Etoudi',
+                'Nlongkak', 'Etoa-Meki', 'Ekounou', 'Nkolbisson', 'Obili', 'Omnisports',
+                'Mimboman', 'Mokolo', 'Tsinga', 'Elig-Essono', 'Efoulan',
+            ],
+
+            'Bafoussam' => [
+                'Banego', 'Tamdja', 'Kopou', 'Djeleng', 'Tchouo', 'Kamkop', 'Ngouache',
+                'Famla', 'Lafé-Baleng', 'Mairie', 'Marché A', 'Marché B',
+            ],
+
+            'Garoua' => [
+                'Plateau', 'Poli', 'Demsa', 'Laïndé', 'Roumde Adjia', 'Bokle', 'Pitoa', 'Tcholliré',
+            ],
+
+            'Bertoua' => [
+                'Mokolo II', 'Ngaikada', 'Kano', 'Nkolbikon', 'Enia', 'Madina', 'Ndiabomo', 'Ndeme',
+            ],
         ];
 
-        foreach ($quartiers as $quartier) {
-            Quartier::create($quartier);
+        // Insertion dans la base de données
+        foreach ($data as $nomVille => $quartiers) {
+            $ville = Ville::where('nomVille', $nomVille)->first();
+
+            if ($ville) {
+                foreach ($quartiers as $quartier) {
+                    Quartier::create([
+                        'nomQuartier' => $quartier,
+                        'villeId' => $ville->id,
+                    ]);
+                }
+            } else {
+                $this->command->warn("Ville '{$nomVille}' non trouvée. Vérifiez que VilleSeeder a été exécuté.");
+            }
         }
     }
 }

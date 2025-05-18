@@ -15,11 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('msg_fr'); // Message in French
             $table->enum('result', ['ACCEPTE', 'REFUSE'])->nullable(); // Result in French
-<<<<<<< HEAD
-            $table->enum('result_en', ['ACCEPTE', 'REFUSE'])->nullable(); // Result in English
-=======
             $table->enum('result_en', ['ACCEPTED', 'REJECTED'])->nullable(); // Result in English
->>>>>>> 172c567c215f6076d8e6aab0684aa69c300f9117
             $table->date('dateEnv'); // Date of sending
             $table->timestamps();
 

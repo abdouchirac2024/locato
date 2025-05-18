@@ -26,12 +26,6 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign keys
-<<<<<<< HEAD
-            $table->unsignedBigInteger('payId');
-            $table->foreign('payId')->references('id')->on('payements');
-=======
-           
->>>>>>> 172c567c215f6076d8e6aab0684aa69c300f9117
             $table->unsignedBigInteger('logId');
             $table->foreign('logId')->references('id')->on('logements');
 

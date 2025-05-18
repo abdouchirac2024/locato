@@ -61,7 +61,7 @@ class AuthService
 
     public function verifyEmail(User $user, string $code): bool
     {
-        if ($user->verification_code === $code) {
+        if ((string)$user->verification_code === (string)$code) {
             $user->update([
                 'email_verified_at' => now(),
                 'verification_code' => null,

@@ -19,14 +19,9 @@ return new class extends Migration
             $table->text('contenu_en')->nullable();
             $table->date('date_publication');
             $table->date('date_expiration')->nullable();
-<<<<<<< HEAD
-            $table->boolean('is_active')->default(false);
+            $table->boolean('is_active')->default(true);
             $table->string('create_by')->nullable();
             $table->softDeletes();
-=======
-            $table->boolean('is_active')->default(true);
->>>>>>> 172c567c215f6076d8e6aab0684aa69c300f9117
-
             $table->timestamps();
 
             // Foreign keys

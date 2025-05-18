@@ -14,14 +14,13 @@
     <!-- Wrapper principal pour la largeur maximale -->
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
         <tr>
-            <td align="center" style="padding: 30px 0; border-bottom: 3px solid #e0252c;">
-              <div style="display: block; margin: 0 auto;">
-                <img src="https://i.imgur.com/XoaP9kz.png" alt="Logo Locato" width="60" height="65" style="display: block; margin: 0 auto;" />
-              </div>
-              <div style="font-family: 'Inter', Arial, sans-serif; color: #e0252c; font-weight: bold; font-size: 20px; margin-top: 15px;">Trouvez vite, louez mieux</div>
-              <div style="font-family: 'Inter', Arial, sans-serif; color: #555555; font-size: 14px; margin-top: 5px; margin-bottom: 15px;">Votre maison idéale n'est qu'à quelques clics</div>
-              <div style="width: 100px; height: 4px; background-color: #F1C40F; margin: 0 auto;"></div>
-            </td>
+        <td align="center" style="padding: 30px 0; border-bottom: 3px solid #e0252c;">
+                            <img src="https://i.imgur.com/XoaP9kz.png" alt="Logo Locato" width="60" height="65" style="display: block; margin: 0 auto;" />
+                            
+                            <div style="font-family: 'Inter', Arial, sans-serif; color: #e0252c; font-weight: bold; font-size: 20px; margin-top: 15px;">Trouvez vite, louez mieux</div>
+                            <div style="font-family: 'Inter', Arial, sans-serif; color: #555555; font-size: 14px; margin-top: 5px;">Votre maison idéale n'est qu'à quelques clics</div>
+                            <div style="background-color: #F1C40F; width: 50px; height: 5px; margin: 15px auto;"></div>
+                        </td>
           </tr
                     
                     <!-- Contenu principal -->

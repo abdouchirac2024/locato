@@ -49,7 +49,7 @@ class AuthController extends Controller
 
         if ($this->authService->verifyEmail($user, $request->code)) {
             return response()->json([
-                'message' => 'Email vérifié avec succès. Bienvenue!',
+                'message' => 'Code de vérification valide',
                 'user' => new UserResource($user),
             ]);
         }

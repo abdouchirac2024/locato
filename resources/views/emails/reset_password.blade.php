@@ -19,8 +19,7 @@
                 <table border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                     <!-- En-tête avec logo et slogan -->
                     <tr>
-                        <td align="center" style="padding: 30px 0; border-bottom: 3px solid #e0252c;">
-                            <!-- Logo Image -->
+                    <td align="center" style="padding: 30px 0; border-bottom: 3px solid #e0252c;">
                             <img src="https://i.imgur.com/XoaP9kz.png" alt="Logo Locato" width="60" height="65" style="display: block; margin: 0 auto;" />
                             
                             <div style="font-family: 'Inter', Arial, sans-serif; color: #e0252c; font-weight: bold; font-size: 20px; margin-top: 15px;">Trouvez vite, louez mieux</div>

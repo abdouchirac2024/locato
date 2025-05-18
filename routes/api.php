@@ -4,22 +4,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // ===== VERSION develop (commentée pour éviter les doublons) =====
-/*
-use App\Http\Controllers\Api\Ville\VilleController;
-use App\Http\Controllers\Api\Quartier\QuartierController;
+
+
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\LogementController;
 use App\Http\Controllers\Api\BailleurController;
-*/
+
 // ===== VERSION abdou =====
 //
 // Contrôleurs généraux
 use App\Http\Controllers\Api\VilleController;
 use App\Http\Controllers\Api\QuartierController;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\PasswordResetController;
-use App\Http\Controllers\Api\LogementController;
+
+
 use App\Http\Controllers\Api\Annonce\AnnonceController;
 //
 // Contrôleurs Admin
@@ -53,6 +51,17 @@ Route::prefix('auth')->name('auth.')->group(function () {
         Route::middleware('admin')->group(function () {
             Route::put('/users/{id}/status', [AuthController::class, 'updateUserStatus'])->name('users.status');
         });
+    });
+});
+
+
+
+// Routes pour la gestion des bailleurs
+Route::prefix('bailleurs')->name('bailleurs.')->group(function () {
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+        Route::post('/verify', [BailleurController::class, 'verify'])->name('verify');
+        Route::get('/', [BailleurController::class, 'index'])->name('index');
+        Route::put('/{id}/status', [BailleurController::class, 'updateStatus'])->name('status.update');
     });
 });
 
