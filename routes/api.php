@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// ===== VERSION develop (commentée pour éviter les doublons) =====
 
 
 use App\Http\Controllers\Api\Auth\AuthController;
@@ -32,7 +31,8 @@ use App\Http\Controllers\Api\Admin\LogementController as AdminLogementController
 
 Route::get('/', fn() => response()->json(['message' => config('app.name', 'Locato') . ' API is running!']));
 
-// ======================= AUTHENTIFICATION =======================
+
+// --- Routes d'Authentification ---
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->name('verify-email');
@@ -54,16 +54,39 @@ Route::prefix('auth')->name('auth.')->group(function () {
     });
 });
 
-
-
 // Routes pour la gestion des bailleurs
 Route::prefix('bailleurs')->name('bailleurs.')->group(function () {
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-        Route::post('/verify', [BailleurController::class, 'verify'])->name('verify');
         Route::get('/', [BailleurController::class, 'index'])->name('index');
         Route::put('/{id}/status', [BailleurController::class, 'updateStatus'])->name('status.update');
     });
 });
+
+// --- Routes pour Villes et Quartiers ---
+Route::prefix('villes')->group(function () {
+    Route::get('/', [VilleController::class, 'index']);
+    Route::get('/deleted', [VilleController::class, 'deleted']);
+    Route::get('/{id}', [VilleController::class, 'show']);
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+        Route::post('/', [VilleController::class, 'store']);
+        Route::put('/{id}', [VilleController::class, 'update']);
+        Route::delete('/{id}', [VilleController::class, 'destroy']);
+        Route::put('/{id}/restore', [VilleController::class, 'restore']);
+    });
+});
+
+Route::prefix('quartiers')->group(function () {
+    Route::get('/', [QuartierController::class, 'index']);
+    Route::get('/deleted', [QuartierController::class, 'deleted']);
+    Route::get('/{id}', [QuartierController::class, 'show']);
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+        Route::post('/', [QuartierController::class, 'store']);
+        Route::put('/{id}', [QuartierController::class, 'update']);
+        Route::delete('/{id}', [QuartierController::class, 'destroy']);
+        Route::put('/{id}/restore', [QuartierController::class, 'restore']);
+    });
+});
+
 
 // ======================= ROUTES PUBLIQUES =======================
 Route::apiResource('villes', VilleController::class)->only(['index', 'show']);
