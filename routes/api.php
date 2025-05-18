@@ -10,15 +10,14 @@ use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\LogementController;
 use App\Http\Controllers\Api\BailleurController;
 
-// ===== VERSION abdou =====
-//
-// Contrôleurs généraux
+
+
 use App\Http\Controllers\Api\VilleController;
 use App\Http\Controllers\Api\QuartierController;
 
 
 use App\Http\Controllers\Api\Annonce\AnnonceController;
-//
+
 // Contrôleurs Admin
 use App\Http\Controllers\Api\Admin\TypeLogementController as AdminTypeLogementController;
 use App\Http\Controllers\Api\Admin\LogementController as AdminLogementController;
