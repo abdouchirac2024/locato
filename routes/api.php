@@ -22,6 +22,9 @@ use App\Http\Controllers\Api\Annonce\AnnonceController;
 use App\Http\Controllers\Api\Admin\TypeLogementController as AdminTypeLogementController;
 use App\Http\Controllers\Api\Admin\LogementController as AdminLogementController;
 
+// Routes pour les avis
+use App\Http\Controllers\Api\AvisController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -141,4 +144,22 @@ Route::put('/confirm-annonce/{id}', [AnnonceController::class, 'confirmAnnonce']
 
 Route::middleware('auth:sanctum')->group(function() {
     Route::post('/create-annonce', [AnnonceController::class, 'storeByBailleur']);
+});
+
+// Routes pour les avis
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/avis', [AvisController::class, 'index']);
+    Route::post('/avis', [AvisController::class, 'store']);
+
+    // Routes admin pour les avis
+    Route::middleware('admin')->group(function () {
+        Route::get('/avis/trashed', [AvisController::class, 'trashed']);
+        Route::put('/avis/{id}/visibility', [AvisController::class, 'updateVisibility']);
+        Route::post('/avis/{id}/restore', [AvisController::class, 'restore']);
+    });
+
+    // Routes pour les avis spécifiques (doivent être après les routes spécifiques)
+    Route::get('/avis/{id}', [AvisController::class, 'show']);
+    Route::put('/avis/{id}', [AvisController::class, 'update']);
+    Route::delete('/avis/{id}', [AvisController::class, 'destroy']);
 });

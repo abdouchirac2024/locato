@@ -14,7 +14,7 @@ class Visite extends Model
         'dateVisite',
         'heureVisite',
         'confirmation',
-       
+        'locaId',
         'logId',
         'motifRejet_fr',
         'motifRejet_en',
@@ -27,10 +27,16 @@ class Visite extends Model
      */
     public function logement()
     {
-        return $this->belongsTo(Logement::class);
+        return $this->belongsTo(Logement::class, 'logId');
     }
 
-   
+    /**
+     * Relation avec les locataires
+     */
+    public function locataire()
+    {
+        return $this->belongsTo(Locataire::class, 'locaId');
+    }
 
     /**
      * Accesseur pour le statut dans la langue courante

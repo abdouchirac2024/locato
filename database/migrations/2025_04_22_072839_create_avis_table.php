@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('note');
             $table->boolean('visible')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
             // Clés étrangères
             $table->unsignedBigInteger('locaId'); // locataire id
