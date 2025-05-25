@@ -11,6 +11,8 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Carbon\Carbon; // Pour la gestion des dates/heures
 use App\Events\VisitCompleted;
+use App\Notifications\NewVisiteRequestForAdminNotification; // Import de la nouvelle notification
+use Illuminate\Contracts\Pagination\LengthAwarePaginator; // Import pour la pagination
 
 class VisiteService
 {
@@ -59,6 +61,12 @@ class VisiteService
 
         // TODO: Notifier le bailleur du logement de la nouvelle demande de visite
         // $logement->bailleur->user->notify(new NewVisiteRequestNotification($visite));
+
+        // Notifier tous les administrateurs de la nouvelle demande de visite
+        $admins = \App\Models\User::where('role', \App\Models\User::ROLE_ADMIN)->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\NewVisiteRequestForAdminNotification($visite));
+        }
 
         return $visite->load(['logement', 'locataire.user']);
     }

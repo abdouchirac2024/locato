@@ -18,6 +18,7 @@ class Visite extends Model
     public const STATUT_EFFECTUEE = 'EFFECTUEE';
     // Statut si le bailleur propose une nouvelle date/heure
     public const STATUT_CONTRE_PROPOSITION = 'CONTRE_PROPOSITION';
+    public const STATUT_DEMANDEE = 'DEMANDEE';
 
 
     protected $fillable = [
@@ -78,13 +79,50 @@ class Visite extends Model
 
     protected static function translateAndSet(self $model, string $sourceField, string $targetField): void
     {
+        // Mappage manuel pour les champs de statut et de motif de rejet
+        $statusMapping = [
+            'DEMANDEE' => 'REQUESTED',
+            'PROGRAMMEE' => 'SCHEDULED',
+            'ANNULEE_LOCATAIRE' => 'CANCELLED_BY_TENANT',
+            'ANNULEE_BAILLEUR' => 'CANCELLED_BY_LANDLORD',
+            'REPORTEE_BAILLEUR' => 'POSTPONED_BY_LANDLORD',
+            'EFFECTUEE' => 'COMPLETED',
+            'CONTRE_PROPOSITION' => 'COUNTER_PROPOSED',
+        ];
+
+        $motifMapping = [
+            // Ajoutez ici les mappages pour motifRejet_fr -> motifRejet_en si vous avez des valeurs fixes
+            // Si motifRejet_fr peut être du texte libre, la traduction automatique peut être préférable,
+            // mais il faudra ajuster la migration pour accepter le texte libre si ce n'est pas déjà le cas.
+        ];
+
         if (!empty($model->{$sourceField})) {
-            try {
-                $translator = new GoogleTranslate('en', 'fr');
-                $model->{$targetField} = $translator->translate($model->{$sourceField});
-            } catch (\Throwable $e) {
-                Log::error("Translation failed for Visite {$sourceField} ID {$model->id}: " . $e->getMessage());
-                $model->{$targetField} = $model->{$sourceField}; // Fallback
+            if ($sourceField === 'statut_fr' && $targetField === 'statut_en') {
+                $model->{$targetField} = $statusMapping[$model->{$sourceField}] ?? null;
+                 if (is_null($model->{$targetField})) {
+                     Log::warning("Visite Model: No English mapping found for statut_fr: " . $model->{$sourceField});
+                 }
+            } elseif ($sourceField === 'motifRejet_fr' && $targetField === 'motifRejet_en') {
+                 // Utiliser le mappage si défini, sinon fallback ou traduction automatique si texte libre
+                 $model->{$targetField} = $motifMapping[$model->{$sourceField}] ?? $model->{$sourceField}; // Fallback simple pour l'instant
+                 // Si texte libre avec traduction automatique:
+                 // try {
+                 //     $translator = new GoogleTranslate('fr', 'en');
+                 //     $model->{$targetField} = $translator->translate($model->{$sourceField});
+                 // } catch (\Throwable $e) {
+                 //     Log::error("Translation failed for motifRejet_fr ID {$model->id}: " . $e->getMessage());
+                 //     $model->{$targetField} = $model->{$sourceField}; // Fallback
+                 // }
+            } else {
+                 // Logique de traduction automatique pour les autres champs si nécessaire
+                try {
+                    // Assurez-vous que les langues sont correctes ici si vous utilisez toujours GoogleTranslate pour d'autres champs
+                    $translator = new GoogleTranslate('fr', 'en'); // Exemple: traduire du français vers l'anglais pour d'autres champs
+                    $model->{$targetField} = $translator->translate($model->{$sourceField});
+                } catch (\Throwable $e) {
+                    Log::error("Translation failed for Visite {$sourceField} ID {$model->id}: " . $e->getMessage());
+                    $model->{$targetField} = $model->{$sourceField}; // Fallback
+                }
             }
         } else {
             $model->{$targetField} = null;

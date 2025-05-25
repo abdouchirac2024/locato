@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\LogementResource; // Pour afficher les détails du logement
 use App\Http\Resources\UserResource; // Pour afficher les détails de l'utilisateur (locataire)
+use Carbon\Carbon; // Ajout de l'import pour la classe Carbon
 
 class VisiteResource extends JsonResource
 {

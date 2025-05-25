@@ -35,6 +35,10 @@ class VisiteController extends Controller
         // L'autorisation (est locataire ?) est gérée par le FormRequest
         try {
             $visite = $this->visiteService->requestVisite($request->validated());
+
+            // Charger les relations nécessaires pour la ressource
+            $visite->load(['logement', 'locataire.user']);
+
             return (new VisiteResource($visite))
                     ->response()
                     ->setStatusCode(Response::HTTP_CREATED);
