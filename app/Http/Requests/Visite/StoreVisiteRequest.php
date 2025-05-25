@@ -5,6 +5,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Logement; // Pour vérifier si le logement existe et est approuvé
 use App\Models\Visite; // Pour les constantes de statut
+use Illuminate\Validation\Rule;
 
 class StoreVisiteRequest extends FormRequest
 {
