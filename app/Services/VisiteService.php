@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Carbon\Carbon; // Pour la gestion des dates/heures
+use App\Events\VisitCompleted;
 
 class VisiteService
 {
@@ -105,6 +106,10 @@ class VisiteService
 
         $visite->save(); // Le modèle gère la traduction du statut
         Log::info("Service: Visite status updated", ['visite_id' => $visite->id, 'new_status' => $visite->statut]);
+
+        if ($newStatusFr === Visite::STATUT_EFFECTUEE) {
+            VisitCompleted::dispatch($visite);
+        }
 
         // TODO: Notifier le locataire du changement de statut
         // $visite->locataire->user->notify(new VisiteStatusUpdatedNotification($visite));

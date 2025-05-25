@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\PasswordResetController; // S'il est à la racine de Api/
 use App\Http\Controllers\Api\Logement\LogementController; // Mis dans Api/Logement/
+use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\BailleurController;      // Semble être à la racine de Api/
 use App\Http\Controllers\Api\Ville\VilleController;         // Mis dans Api/Ville/
 use App\Http\Controllers\Api\Quartier\QuartierController;   // Mis dans Api/Quartier/
@@ -101,6 +102,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{visite}/status', [VisiteController::class, 'updateStatus'])->name('updateStatus')->where('visite', '[0-9]+'); // Bailleur change statut
         Route::put('/{visite}/cancel', [VisiteController::class, 'cancelByLocataire'])->name('cancelByLocataire')->where('visite', '[0-9]+'); // Locataire annule
     });
+
+    // Invoices
+    Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 
 });
 
