@@ -14,6 +14,12 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    // --- AJOUT : Constantes pour les rôles ---
+    public const ROLE_ADMIN = 'ADMIN';
+    public const ROLE_BAILLEUR = 'Bailleur';
+    public const ROLE_LOCATAIRE = 'Locataire';
+    // --- FIN AJOUT ---
+
     protected $fillable = [
         'name',
         'email',
@@ -56,24 +62,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Bailleur::class);
     }
 
-    public function isAdmin()
+    // --- MÉTHODES DE VÉRIFICATION DE RÔLE ---
+    public function isAdmin(): bool
     {
-        return $this->role === 'ADMIN';
+        return $this->role === self::ROLE_ADMIN;
     }
 
-    public function isBailleur()
+    public function isBailleur(): bool
     {
-        return $this->role === 'Bailleur';
+        return $this->role === self::ROLE_BAILLEUR;
     }
 
-    public function isBailleurVerified()
+    public function isLocataire(): bool
+    {
+        return $this->role === self::ROLE_LOCATAIRE;
+    }
+    // --- FIN MISE À JOUR ---
+
+    public function isBailleurVerified(): bool
     {
         return $this->isBailleur() && $this->bailleur->statut_fr === 'verifie';
-    }
-
-    public function isLocataire()
-    {
-        return $this->role === 'Locataire';
     }
 
     public function sendEmailVerificationNotification()
@@ -81,11 +89,10 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new \App\Notifications\VerifyEmailNotification($this->verification_code));
     }
 
-
     public function sendPasswordResetNotification($token)
-{
-    $this->notify(new \App\Notifications\ResetPasswordNotification($token));
-}
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 
     // Méthode pour activer un utilisateur
     public function activate()
@@ -100,7 +107,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // Vérifier si l'utilisateur est actif
-    public function isActive()
+    public function isActive(): bool
     {
         return $this->status === 'active';
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Logement;
 
 use App\Models\Logement; // Utilisé pour le type-hinting dans les routes si Route Model Binding
 use Illuminate\Http\Request;

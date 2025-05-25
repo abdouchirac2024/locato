@@ -133,7 +133,7 @@ class AuthController extends Controller
     public function resendVerificationCode(): JsonResponse
     {
         $user = auth()->user();
-        
+
         if ($user->email_verified_at) {
             return response()->json([
                 'message' => 'Votre email est déjà vérifié'
@@ -176,4 +176,4 @@ class AuthController extends Controller
             'data' => new UserResource($user)
         ]);
     }
-} 
+}

@@ -6,18 +6,20 @@ use App\Mail\VerificationCodeMail;
 use App\Mail\WelcomeMail;
 use App\Mail\BailleurVerifiedMail;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 
 class AuthService
 {
     public function register(array $data): User
     {
-        // Générer un matricule unique
         $matricule = strtoupper(Str::random(7));
 
-        // Créer l'utilisateur
         $user = User::create([
             'name' => $data['name'],
             'prenom' => $data['prenom'] ?? null,
@@ -28,32 +30,29 @@ class AuthService
             'quartier_id' => $data['quartier_id'] ?? null,
             'matricule' => $matricule,
             'verification_code' => rand(1000, 9999),
+            'status' => 'active',
         ]);
 
-        // Créer le profil spécifique selon le rôle
         if ($user->isLocataire()) {
             $user->locataire()->create([
-                'preference' => $data['preference'],
+                'preference' => $data['preference'] ?? null,
             ]);
         } elseif ($user->isBailleur()) {
             $user->bailleur()->create([
-                'numFiscal' => $data['numFiscal'],
-                'description_fr' => $data['description'],
+                'numFiscal' => $data['numFiscal'] ?? null,
+                'description_fr' => $data['description'] ?? null,
                 'nbrLog' => 0,
+                'verif' => false,
+                'statut_fr' => 'en_attente',
             ]);
         }
 
-        // Envoyer le code de vérification par email si email fourni
         if ($user->email) {
             try {
-                \Log::info('Tentative d\'envoi d\'email de vérification à: ' . $user->email);
                 Mail::to($user->email)->send(new VerificationCodeMail($user->verification_code));
-                \Log::info('Email de vérification envoyé avec succès à: ' . $user->email);
             } catch (\Exception $e) {
-                \Log::error('Erreur lors de l\'envoi de l\'email de vérification à ' . $user->email . ': ' . $e->getMessage());
+                Log::error('Erreur envoi email vérification: ' . $e->getMessage());
             }
-        } else {
-            \Log::warning('Pas d\'email fourni pour l\'utilisateur: ' . $user->name);
         }
 
         return $user;
@@ -65,16 +64,14 @@ class AuthService
             $user->update([
                 'email_verified_at' => now(),
                 'verification_code' => null,
+                'status' => 'active',
             ]);
 
-            // Envoyer un email de bienvenue
             if ($user->email) {
                 try {
-                    \Log::info('Tentative d\'envoi d\'email de bienvenue à: ' . $user->email);
                     Mail::to($user->email)->send(new WelcomeMail($user));
-                    \Log::info('Email de bienvenue envoyé avec succès à: ' . $user->email);
                 } catch (\Exception $e) {
-                    \Log::error('Erreur lors de l\'envoi de l\'email de bienvenue à ' . $user->email . ': ' . $e->getMessage());
+                    Log::error('Erreur envoi email bienvenue: ' . $e->getMessage());
                 }
             }
 
@@ -84,113 +81,154 @@ class AuthService
         return false;
     }
 
-    public function login(string $login, string $password): ?User
+    public function login(string $login, string $password): User
     {
-        $user = User::where('email', $login)
-            ->orWhere('telephone', $login)
-            ->first();
+        $user = User::where('email', $login)->orWhere('telephone', $login)->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
-            throw new \Exception("Identifiants incorrects");
+            throw new \Exception("Identifiants incorrects.");
         }
 
-        // Vérifier si c'est un bailleur
-        if ($user->isBailleur()) {
-            if (!$user->bailleur) {
-                throw new \Exception("Votre compte bailleur n'est pas encore configuré. Veuillez contacter l'administrateur.");
-            }
+        if ($user->status !== 'active') {
+            throw new \Exception("Votre compte est inactif. Veuillez contacter l'administrateur.");
+        }
+
+        if ($user->isBailleur() && (!$user->bailleur || !$user->bailleur->verif)) {
+            throw new \Exception("Votre compte bailleur n'est pas encore vérifié par l'administrateur.");
         }
 
         return $user;
     }
 
-    public function verifyBailleur(User $user): bool
+    public function updateProfile(User $user, array $data): User
     {
-        if (!$user->isBailleur()) {
-            return false;
-        }
+        Log::info('AuthService: Updating profile', ['user_id' => $user->id, 'data_keys' => array_keys($data)]);
 
-        // Mettre à jour tous les champs du bailleur
-        $bailleur = $user->bailleur;
-        if (!$bailleur) {
-            return false;
-        }
+        $updateData = [];
 
-        $bailleur->verif = true;
-        $bailleur->statut_fr = 'verifie';
-        $bailleur->statut_en = 'verified';
-        $bailleur->save();
+        if (isset($data['name'])) $updateData['name'] = $data['name'];
+        if (array_key_exists('prenom', $data)) $updateData['prenom'] = $data['prenom'];
+        if (isset($data['email'])) $updateData['email'] = $data['email'];
+        if (isset($data['telephone'])) $updateData['telephone'] = $data['telephone'];
+        if (array_key_exists('quartier_id', $data)) $updateData['quartier_id'] = $data['quartier_id'];
 
-        // Mettre à jour la date de vérification de l'utilisateur
-        $user->email_verified_at = now();
-        $user->save();
+        // Logic for photoProfile upload
+        if (isset($data['photoProfile'])) {
+            // Ensure the uploaded file is a valid UploadedFile instance and is valid
+            if ($data['photoProfile'] instanceof UploadedFile && $data['photoProfile']->isValid()) {
+                // Delete old profile photo if it exists
+                if ($user->photoProfile && Storage::disk('public')->exists($user->photoProfile)) {
+                    Storage::disk('public')->delete($user->photoProfile);
+                    Log::debug('Old profile photo deleted', ['path' => $user->photoProfile]);
+                }
 
-        // Envoyer l'email de notification
-        if ($user->email) {
-            try {
-                \Log::info('Tentative d\'envoi d\'email de vérification bailleur', [
-                    'email' => $user->email,
-                    'user_id' => $user->id
-                ]);
-                
-                Mail::to($user->email)->send(new BailleurVerifiedMail($user));
-                
-                \Log::info('Email de vérification bailleur envoyé avec succès', [
-                    'email' => $user->email,
-                    'user_id' => $user->id
-                ]);
-            } catch (\Exception $e) {
-                \Log::error('Erreur lors de l\'envoi de l\'email de vérification bailleur', [
-                    'email' => $user->email,
+                // Store the new profile photo
+                $path = $data['photoProfile']->store('profiles', 'public');
+
+                // Check if the store operation was successful
+                if ($path) {
+                    $updateData['photoProfile'] = $path;
+                    Log::debug('New profile photo stored', ['path' => $path]);
+                } else {
+                    Log::error('Failed to store new profile photo (store method returned false/null)', ['user_id' => $user->id, 'original_name' => $data['photoProfile']->getClientOriginalName()]);
+                    // You might want to throw an exception here or return an error message
+                    // For now, we log and continue, which means the photoProfile field won't be updated.
+                }
+            } else {
+                Log::warning('Invalid or no profile photo uploaded (not valid or not UploadedFile)', [
                     'user_id' => $user->id,
-                    'error' => $e->getMessage()
+                    'file_isset' => isset($data['photoProfile']),
+                    'is_uploaded_file' => isset($data['photoProfile']) ? ($data['photoProfile'] instanceof UploadedFile) : false,
+                    'is_valid' => (isset($data['photoProfile']) && $data['photoProfile'] instanceof UploadedFile) ? $data['photoProfile']->isValid() : 'N/A'
                 ]);
+                // Skip updating photoProfile if file is invalid
             }
         }
 
-        return true;
-    }
-
-    public function updateProfile(User $user, array $data): User
-    {
-        $user->update([
-            'name' => $data['name'] ?? $user->name,
-            'prenom' => $data['prenom'] ?? $user->prenom,
-            'email' => $data['email'] ?? $user->email,
-            'telephone' => $data['telephone'] ?? $user->telephone,
-            'quartier_id' => $data['quartier_id'] ?? $user->quartier_id,
-        ]);
-
-        // Mettre à jour la photo de profil si fournie
-        if (isset($data['photoProfile'])) {
-            $path = $data['photoProfile']->store('profiles', 'public');
-            $user->update(['photoProfile' => $path]);
-        }
-
-        // Mettre à jour la CNI si fournie
         if (isset($data['cni'])) {
-            $path = $data['cni']->store('cni', 'public');
-            $user->update(['cni' => $path]);
+             if ($data['cni'] instanceof UploadedFile && $data['cni']->isValid()) {
+                if ($user->cni && Storage::disk('public')->exists($user->cni)) {
+                    Storage::disk('public')->delete($user->cni);
+                }
+                $path = $data['cni']->store('cni_files', 'public');
+                 if ($path) {
+                    $updateData['cni'] = $path;
+                 } else {
+                     Log::error('Failed to store CNI file', ['user_id' => $user->id]);
+                 }
+             } else {
+                 Log::warning('Invalid or no CNI file uploaded', ['user_id' => $user->id]);
+             }
         }
 
-        // Mettre à jour les données spécifiques au rôle
-        if ($user->isLocataire() && isset($data['preference'])) {
+
+        if (!empty($updateData)) {
+            $user->update($updateData);
+        }
+
+        if ($user->isLocataire() && array_key_exists('preference', $data)) {
             $user->locataire()->update(['preference' => $data['preference']]);
         }
 
         if ($user->isBailleur()) {
-            $updateData = [];
-            if (isset($data['numFiscal'])) {
-                $updateData['numFiscal'] = $data['numFiscal'];
-            }
-            if (isset($data['description'])) {
-                $updateData['description_fr'] = $data['description'];
-            }
-            if (!empty($updateData)) {
-                $user->bailleur()->update($updateData);
+            $bailleurUpdateData = [];
+            if (array_key_exists('numFiscal', $data)) $bailleurUpdateData['numFiscal'] = $data['numFiscal'];
+            if (array_key_exists('description', $data)) $bailleurUpdateData['description_fr'] = $data['description'];
+            if (!empty($bailleurUpdateData)) {
+                $user->bailleur()->update($bailleurUpdateData);
             }
         }
 
-        return $user->fresh();
+        return $user->fresh(['locataire', 'bailleur', 'quartier']);
+    }
+
+    public function updateUserRole(int $userIdToUpdate, string $newRole): User
+    {
+        Log::info('AuthService: Admin attempting to update user role.', [
+            'admin_id' => Auth::id(),
+            'user_to_update_id' => $userIdToUpdate,
+            'new_role' => $newRole
+        ]);
+
+        $userToUpdate = User::findOrFail($userIdToUpdate);
+
+        $validRoles = [User::ROLE_ADMIN, User::ROLE_BAILLEUR, User::ROLE_LOCATAIRE];
+        if (!in_array($newRole, $validRoles)) {
+            throw new \InvalidArgumentException("Le rôle '{$newRole}' n'est pas valide.");
+        }
+
+        if ($userToUpdate->role !== $newRole) {
+            $userToUpdate->role = $newRole;
+            $userToUpdate->save();
+
+            if ($newRole === User::ROLE_BAILLEUR && !$userToUpdate->bailleur) {
+                $userToUpdate->bailleur()->create([]);
+            } elseif ($newRole === User::ROLE_LOCATAIRE && !$userToUpdate->locataire) {
+                $userToUpdate->locataire()->create([]);
+            }
+
+            Log::info('User role updated successfully.', ['user_id' => $userToUpdate->id, 'new_role' => $newRole]);
+        } else {
+            Log::info('User role is already set to the target role.', ['user_id' => $userToUpdate->id, 'role' => $newRole]);
+        }
+
+        return $userToUpdate->fresh(['locataire', 'bailleur']);
+    }
+
+    public function verifyBailleur(User $bailleur): bool
+    {
+        if (!$bailleur->isBailleur() || !$bailleur->bailleur) {
+            throw new \Exception("L'utilisateur n'est pas un bailleur ou son profil est incomplet.");
+        }
+
+        $bailleur->bailleur->update(['verif' => true, 'statut_fr' => 'validé']);
+
+        try {
+            Mail::to($bailleur->email)->send(new BailleurVerifiedMail($bailleur));
+        } catch (\Exception $e) {
+            Log::error("Erreur lors de l'envoi de l'email de vérification du bailleur : " . $e->getMessage());
+        }
+
+        return true;
     }
 }
